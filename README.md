@@ -1,12 +1,15 @@
-# Collaborative-driven Quantum Feature Selection
+# Are Quantum Computers Practical Yet? A Case for Feature Selection in Recommender Systems using Tensor Networks
 
-This repository was developed by Riccardo Nembrini, PhD student at Politecnico di Milano.
-See the websites of our [quantum computing group](https://quantum.polimi.it/) and of our
-[recommender systems group](http://recsys.deib.polimi.it/) for more information on our teams and works.
-This repository contains the source code for the article "**Feature Selection for Recommender Systems with Quantum
-Computing**".
+This repository contains the source code for the RecSys 2022 Reproducibility track submission.
 
-Here we explain how to install dependencies, setup the connection to D-Wave Leap quantum cloud services and how to run
+**It is a fork from the repository of the original paper that we base our work on.**
+The original repository can be found here https://github.com/qcpolimi/CQFS. We 
+wanted to make it as less intrusive as possible to perform fair replication of
+the results. We added a TTOpt optimizer as a solver instead of the D-Wave 
+quantum annealer and created necessary experimental scripts by mimicking the 
+original source code.
+
+Here we explain how to install dependencies, and how to run
 experiments included in this repository.
 
 ## Installation
@@ -37,10 +40,11 @@ on the terminal:
 >```
 
 Then, make sure you correctly activated the environment and install all the required packages through `pip`:
-
 ```bash
 pip install -r requirements.txt
 ```
+
+Moreover, install TTOpt library by following the instructions from https://github.com/SkoltechAI/ttopt.
 
 After installing the dependencies, it is suggested to compile Cython code in the repository.
 
@@ -57,35 +61,10 @@ to [THIS](https://github.com/cython/cython/wiki/InstallingOnWindows) guide.
 
 Now you can compile all Cython algorithms by running the following command. The script will compile within the current
 active environment. The code has been developed for Linux and Windows platforms. During the compilation you may see some
-warnings.
+warnings. Navigate to `recsys/` directory and run:
 
 ```bash
 python run_compile_all_cython.py
-```
-
-## D-Wave Setup
-
-In order to make use of D-Wave cloud services you must first sign-up to [D-Wave Leap](https://cloud.dwavesys.com/leap/)
-and get your API token.
-
-Then, you need to run the following command in the newly created Python environment:
-
-```bash
-dwave setup
-```
-
-This is a guided setup for D-Wave Ocean SDK. When asked to select non-open-source packages to install you should
-answer `y` and install at least _D-Wave Drivers_ (the D-Wave Problem Inspector package is not required, but could be
-useful to analyse problem solutions, if solving problems with the QPU only).
-
-Then, continue the configuration by setting custom properties (or keeping the default ones, as we suggest), apart from
-the `Authentication token` field, where you should paste your API token obtained on the D-Wave Leap dashboard.
-
-You should now be able to connect to D-Wave cloud services. In order to verify the connection, you can use the following
-command, which will send a test problem to D-Wave's QPU:
-
-```bash
-dwave ping
 ```
 
 ## Running CQFS Experiments
@@ -110,7 +89,7 @@ After preparing the datasets, you should run the following command under the `da
 
 
 ```bash
-python split_NameOfTheDataset.py
+python split_<NameOfTheDataset>.py
 ```
 
 This python script will generate the data splits used in the experiments. Moreover, it will preprocess the dataset and
@@ -118,7 +97,7 @@ check for any error in the preprocessing phase. The resulting splits are saved i
 `recsys/Data_manager_split_datasets` directory.
 
 After splitting the dataset, you can actually run the experiments. All the experiment scripts are in the `experiments`
-directory, so enter this folder first.
+directory, so navigate to the folder `experiments/<NameOfTheDataset>` first.
 Each dataset has separated experiment scripts that you can find in the corresponding directories.
 From now on, we will assume that you are running the following commands in the dataset-specific folders, thus running
 the scripts contained there.
@@ -139,7 +118,7 @@ Then, you can run the CQFS procedure. We divided the procedure into a _selection
 perform the selection through CQFS run the following command:
 
 ```bash
-python CQFS.py
+python CQFSTT.py
 ```
 
 This script will solve the CQFS problem on the corresponding dataset and save all the selected features in appropriate
@@ -148,26 +127,13 @@ subdirectories under the `results` directory.
 After solving the feature selection problem, you should run the following command:
 
 ```bash
-python CQFSTrainer.py
+python CQFSTTTrainer.py
 ```
 
 This script will optimize an ItemKNN content-based recommender system for each selection corresponding to the given
 hyperparameters (and previously obtained through CQFS), using only the selected features. Again, all the results are
 saved in the corresponding subdirectories under the `results` directory.
 
-> NOTE: Each selection with D-Wave Leap hybrid service on these problems is performed in around 8 seconds for The Movies
-> Dataset and around 30 for CiteULike_a.
-> Therefore, running the script as it is would result in consuming all the free time given with the developer plan on
-> D-Wave Leap and may result in errors or invalid selections when there's no free time remaining.
->
-> We suggest to reduce the number of hyperparameters passed when running the experiments or, even better, chose a
-> collaborative model and perform all the experiments on it.
->
-> This is not the case when running experiments with Simulated Annealing, since it is executed locally.
-> 
-> For Xing Challenge 2017 experiments run directly on the D-Wave QPU.
-> Leaving all the hyperparameters unchanged, all the experiments should not exceed the free time of the developer plan.
-> Pay attention when increasing the number of reads from the sampler or the annealing time.
 
 ### Baselines
 
@@ -183,9 +149,3 @@ python baseline_TFIDF.py
 # CFeCBF feature weighting baseline
 python baseline_CFW.py
 ```
-
-## Acknowledgements
-Software produced by Riccardo Nembrini.
-Recommender systems library by Maurizio Ferrari Dacrema.
-
-Article authors: Riccardo Nembrini, Maurizio Ferrari Dacrema, Paolo Cremonesi
