@@ -39,7 +39,7 @@ on the terminal:
 >export PYTHONPATH=$PYTHONPATH:/path/to/project/folder
 >```
 
-Then, make sure you correctly activated the environment and install all the required packages through `pip`.
+Then, make sure you correctly activated the environment and install all the required packages through `pip`:
 ```bash
 pip install -r requirements.txt
 ```
