@@ -1,4 +1,4 @@
-# optrecsys
+# TTOpt QUBO benchmark
 
 
 ## Description
